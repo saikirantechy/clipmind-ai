@@ -1,0 +1,114 @@
+VidAI (VideoDB MVP) — run on Windows with VS Code · ~2–3 minutes
+
+================================================================================
+1) Open a terminal in backend
+================================================================================
+
+In VS Code:
+  Right‑click the "backend" folder → "Open in Integrated Terminal"
+
+(Optional but recommended) Python 3.10+ venv:
+
+  python -m venv .venv
+  .\.venv\Scripts\Activate.ps1
+
+================================================================================
+2) Install dependencies
+================================================================================
+
+  pip install -r requirements.txt
+
+If anything is missing:
+
+  pip install videodb fastapi uvicorn python-multipart
+
+================================================================================
+3) Set API key (required)
+================================================================================
+
+Get a key: https://console.videodb.io
+
+For this terminal session only (PowerShell):
+
+  $env:VIDEODB_API_KEY = "sk-xxxx"
+
+Check it is set:
+
+  echo $env:VIDEODB_API_KEY
+
+Persist for future shells (new windows only after setx):
+
+  setx VIDEODB_API_KEY "sk-xxxx"
+
+Also supported: VIDEO_DB_API_KEY (legacy name).
+
+================================================================================
+4) Start backend (serves API + static UI)
+================================================================================
+
+From the backend folder (use python -m so Windows finds uvicorn):
+
+  python -m uvicorn main:app --reload --host 0.0.0.0 --port 8765
+
+If uvicorn is on PATH, the short form also works:
+
+  uvicorn main:app --reload --host 0.0.0.0 --port 8765
+
+================================================================================
+5) Open the app
+================================================================================
+
+  http://127.0.0.1:8765
+
+================================================================================
+Quick test (sanity)
+================================================================================
+
+1. Paste a YouTube URL → Process (first ingest can take tens of seconds or
+   longer on longer videos or slow Wi‑Fi).
+2. Try search: important
+3. Click Play clip on a result → player should switch to that segment.
+4. Generate reel / AI structured summary as needed.
+
+Example URL (well known; longer than ideal for a keynote — prefer a short clip
+or use canned demo below):
+
+  https://www.youtube.com/watch?v=dQw4w9WgXcQ
+
+================================================================================
+Demo safety (before judging)
+================================================================================
+
+- Run once before presenting; keep “Load canned demo” ready.
+- Pin a pre‑processed asset on the demo machine:
+
+    $env:VIDEODB_DEMO_VIDEO_ID = "VIDEO_ID_HERE"
+
+  Then click “Load canned demo” in the UI (skips re‑ingest).
+
+================================================================================
+If something fails
+================================================================================
+
+ModuleNotFoundError / ImportError
+  → pip install -r requirements.txt
+
+API key / auth errors
+  → echo $env:VIDEODB_API_KEY  (must show your key)
+
+Address already in use (port 8765)
+  → python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
+  → open http://127.0.0.1:8000
+
+Blank page or “nothing loads”
+  → confirm you started uvicorn from the "backend" folder (where main.py is)
+  → read the terminal trace; check browser DevTools → Network for /api/* failures
+
+Send a screenshot + backend log snippet for the fastest debug loop.
+
+================================================================================
+Product notes
+================================================================================
+
+- Semantic search uses the speech / transcript index today.
+- Heavy “object visible in frame” search = Phase 2 (scene index in VideoDB).

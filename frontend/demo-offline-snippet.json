@@ -1,0 +1,5 @@
+{
+  "pitch": "If the projector drops, say: ‘VidAI converts long video into searchable knowledge—transcript-backed search today; visual scene/object search ships as Phase 2.’",
+  "transcript_fallback": "",
+  "message": "Set VIDEODB_DEMO_VIDEO_ID on the demo laptop for one‑click canned playback. Optional: paste a short transcript here for UI-only rehearsals."
+}

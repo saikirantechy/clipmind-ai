@@ -1,0 +1,1105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClipMind AI — Video Intelligence Engine</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg: #0a0e27;
+        --bg-alt: #121a2f;
+        --bg-card: #151d33;
+        --border: #1e2a45;
+        --text: #e8eef7;
+        --text-muted: #8b95b8;
+        --accent: #6a9cff;
+        --accent-light: #a0c4ff;
+        --accent-dark: #4c7eff;
+        --success: #10b981;
+        --danger: #ef4444;
+        --gradient: linear-gradient(90deg, #6a9cff, #9f7cff);
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+          Cantarell, sans-serif;
+        background: linear-gradient(135deg, var(--bg) 0%, #1a1f3a 100%);
+        color: var(--text);
+        line-height: 1.6;
+        min-height: 100vh;
+        position: relative;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+          radial-gradient(
+            circle at 20% 50%,
+            rgba(106, 156, 255, 0.1) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 80%,
+            rgba(159, 124, 255, 0.1) 0%,
+            transparent 50%
+          );
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* Header Section */
+      header {
+        text-align: center;
+        margin-bottom: 3rem;
+        animation: slideDown 0.6s ease;
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .logo {
+        font-size: 3rem;
+        font-weight: 800;
+        background: var(--gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+        letter-spacing: -1px;
+      }
+
+      .subtitle {
+        color: var(--text-muted);
+        font-size: 1.15rem;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+      }
+
+      /* Grid Layout */
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      @media (max-width: 768px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Card Styling */
+      .card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 2rem;
+        backdrop-filter: blur(20px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .card:hover {
+        border-color: var(--accent);
+        box-shadow: 0 12px 48px rgba(106, 156, 255, 0.15);
+        transform: translateY(-2px);
+      }
+
+      .card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--accent),
+          transparent
+        );
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .card:hover::before {
+        opacity: 1;
+      }
+
+      .card h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: var(--text);
+      }
+
+      .card h2::before {
+        content: "";
+        width: 5px;
+        height: 28px;
+        background: var(--gradient);
+        border-radius: 3px;
+        flex-shrink: 0;
+      }
+
+      /* Form Controls */
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      label {
+        display: block;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        margin-bottom: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      input[type="text"],
+      input[type="url"],
+      textarea,
+      select {
+        width: 100%;
+        padding: 0.875rem;
+        background: rgba(15, 23, 34, 0.5);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: var(--text);
+        font-size: 1rem;
+        font-family: inherit;
+        transition: all 0.3s ease;
+      }
+
+      input[type="text"]:focus,
+      input[type="url"]:focus,
+      textarea:focus,
+      select:focus {
+        outline: none;
+        border-color: var(--accent);
+        background: rgba(15, 23, 34, 0.8);
+        box-shadow: 0 0 0 3px rgba(106, 156, 255, 0.15);
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 120px;
+        font-family: "Courier New", monospace;
+        font-size: 0.9rem;
+      }
+
+      /* Buttons */
+      button {
+        padding: 0.875rem 1.75rem;
+        font-size: 1rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-family: inherit;
+        position: relative;
+        overflow: hidden;
+      }
+
+      button::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.2);
+        transition: left 0.4s ease;
+        z-index: -1;
+      }
+
+      button:hover::before {
+        left: 100%;
+      }
+
+      .btn-primary {
+        background: var(--gradient);
+        color: white;
+        width: 100%;
+        box-shadow: 0 8px 16px rgba(106, 156, 255, 0.3);
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 24px rgba(106, 156, 255, 0.4);
+      }
+
+      .btn-primary:active:not(:disabled) {
+        transform: translateY(-1px);
+      }
+
+      .btn-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .btn-group {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+
+      .btn-small {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+      }
+
+      .btn-secondary {
+        background: rgba(106, 156, 255, 0.1);
+        color: var(--accent);
+        border: 1.5px solid var(--accent);
+      }
+
+      .btn-secondary:hover {
+        background: rgba(106, 156, 255, 0.2);
+        box-shadow: 0 8px 16px rgba(106, 156, 255, 0.2);
+      }
+
+      /* Mode Selector */
+      .mode-selector {
+        display: flex;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        background: rgba(15, 23, 34, 0.5);
+        padding: 0.75rem;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+      }
+
+      .mode-btn {
+        flex: 1;
+        padding: 0.75rem;
+        background: transparent;
+        border: 2px solid var(--border);
+        border-radius: 8px;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+
+      .mode-btn:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      .mode-btn.active {
+        background: var(--gradient);
+        border-color: var(--accent);
+        color: white;
+        box-shadow: 0 4px 12px rgba(106, 156, 255, 0.3);
+      }
+
+      /* Loading State */
+      .loading {
+        display: inline-block;
+      }
+
+      .spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(99, 102, 241, 0.3);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin-right: 0.5rem;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Status Messages */
+      .message {
+        padding: 1rem 1.25rem;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        font-size: 0.95rem;
+        display: none;
+        animation: slideIn 0.3s ease;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .message.success {
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid var(--success);
+        color: #6ee7b7;
+      }
+
+      .message.error {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid var(--danger);
+        color: #fca5a5;
+      }
+
+      .message.info {
+        background: rgba(106, 156, 255, 0.1);
+        border: 1px solid var(--accent);
+        color: #a0c4ff;
+      }
+
+      /* Clips Container */
+      .clips-container {
+        max-height: 450px;
+        overflow-y: auto;
+        display: grid;
+        gap: 0.75rem;
+      }
+
+      .clips-container::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .clips-container::-webkit-scrollbar-track {
+        background: rgba(106, 156, 255, 0.05);
+        border-radius: 10px;
+      }
+
+      .clips-container::-webkit-scrollbar-thumb {
+        background: rgba(106, 156, 255, 0.3);
+        border-radius: 10px;
+      }
+
+      /* Clip Card */
+      .clip-item {
+        background: rgba(15, 23, 34, 0.5);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .clip-item::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: var(--gradient);
+        transform: scaleY(0);
+        transform-origin: center;
+        transition: transform 0.3s ease;
+      }
+
+      .clip-item:hover {
+        border-color: var(--accent);
+        background: rgba(106, 156, 255, 0.05);
+        box-shadow: 0 8px 16px rgba(106, 156, 255, 0.1);
+        transform: translateX(4px);
+      }
+
+      .clip-item:hover::before {
+        transform: scaleY(1);
+      }
+
+      .clip-title {
+        font-weight: 700;
+        color: var(--accent-light);
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+      }
+
+      .clip-text {
+        color: var(--text);
+        margin-bottom: 0.75rem;
+        word-wrap: break-word;
+        line-height: 1.5;
+      }
+
+      .clip-meta {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .time-badge {
+        background: rgba(106, 156, 255, 0.2);
+        padding: 0.35rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--accent-light);
+      }
+
+      /* Video Player */
+      .player-placeholder {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        background: linear-gradient(
+          135deg,
+          rgba(106, 156, 255, 0.05),
+          rgba(159, 124, 255, 0.05)
+        );
+        border: 2px dashed var(--border);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+      }
+
+      .player-placeholder:hover {
+        border-color: var(--accent);
+        background: linear-gradient(
+          135deg,
+          rgba(106, 156, 255, 0.1),
+          rgba(159, 124, 255, 0.1)
+        );
+      }
+
+      /* Summary Box */
+      .summary-box {
+        background: rgba(106, 156, 255, 0.05);
+        border: 1px solid var(--accent);
+        border-left: 4px solid var(--gradient);
+        border-radius: 10px;
+        padding: 1.75rem;
+        margin-bottom: 1rem;
+        animation: slideIn 0.3s ease;
+      }
+
+      .summary-title {
+        color: var(--accent-light);
+        font-weight: 700;
+        margin-bottom: 1rem;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .bullet-list {
+        list-style: none;
+        padding: 0;
+      }
+
+      .bullet-list li {
+        padding: 0.75rem 0;
+        color: var(--text);
+        word-wrap: break-word;
+        display: flex;
+        gap: 0.75rem;
+      }
+
+      .bullet-list li::before {
+        content: "▸";
+        color: var(--accent);
+        font-weight: 700;
+        flex-shrink: 0;
+        font-size: 1.2rem;
+      }
+
+      /* Stats */
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .stat {
+        background: rgba(106, 156, 255, 0.05);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.25rem;
+        text-align: center;
+        transition: all 0.3s ease;
+      }
+
+      .stat:hover {
+        border-color: var(--accent);
+        background: rgba(106, 156, 255, 0.1);
+      }
+
+      .stat-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        background: var(--gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .stat-label {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-top: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+
+      /* Sticky Action Bar */
+      .sticky-bar {
+        position: sticky;
+        bottom: 0;
+        background: linear-gradient(180deg, transparent, var(--bg) 50%);
+        padding: 1.5rem 1rem 1rem;
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        z-index: 100;
+        margin-top: 3rem;
+      }
+
+      .sticky-bar button {
+        width: auto;
+        min-width: 140px;
+      }
+
+      /* Footer */
+      footer {
+        text-align: center;
+        color: var(--text-muted);
+        padding: 2rem;
+        border-top: 1px solid var(--border);
+        margin-top: 4rem;
+        font-size: 0.9rem;
+      }
+
+      footer strong {
+        color: var(--accent);
+      }
+
+      /* No Results Message */
+      .empty-state {
+        text-align: center;
+        padding: 2rem;
+        color: var(--text-muted);
+      }
+
+      .empty-state-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.6;
+      }
+
+      /* Responsive */
+      @media (max-width: 640px) {
+        .container {
+          padding: 1rem;
+        }
+
+        .logo {
+          font-size: 2rem;
+        }
+
+        .card {
+          padding: 1.5rem;
+        }
+
+        .sticky-bar {
+          flex-direction: column;
+          gap: 0.75rem;
+        }
+
+        .sticky-bar button {
+          width: 100%;
+        }
+
+        .mode-selector {
+          flex-direction: column;
+        }
+
+        .mode-btn {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <header>
+        <div class="logo">🚀 ClipMind AI</div>
+        <p class="subtitle">Search, clip & understand any video instantly</p>
+      </header>
+
+      <!-- Main Content -->
+      <div class="grid">
+        <!-- Left Column: Process & Search -->
+        <div>
+          <!-- Process Card -->
+          <div class="card">
+            <h2>Process Video</h2>
+
+            <div id="processMessage"></div>
+
+            <div class="form-group">
+              <label>🎥 Video Source (YouTube URL)</label>
+              <input
+                type="url"
+                id="videoUrl"
+                placeholder="https://youtube.com/watch?v=..."
+              />
+            </div>
+
+            <div class="form-group">
+              <label>🎓 Analysis Mode</label>
+              <div class="mode-selector">
+                <button class="mode-btn active" data-mode="student">
+                  🎓 Student
+                </button>
+                <button class="mode-btn" data-mode="creator">🎬 Creator</button>
+                <button class="mode-btn" data-mode="research">
+                  🧠 Research
+                </button>
+              </div>
+            </div>
+
+            <button
+              class="btn-primary"
+              id="processBtn"
+              onclick="processVideo()"
+            >
+              🎬 Process Video
+            </button>
+
+            <!-- Stats -->
+            <div
+              class="stats"
+              id="stats"
+              style="display: none; margin-top: 1.5rem"
+            >
+              <div class="stat">
+                <div class="stat-value" id="statTranscript">0</div>
+                <div class="stat-label">Characters</div>
+              </div>
+              <div class="stat">
+                <div class="stat-value" id="statClips">0</div>
+                <div class="stat-label">Clips</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Search Card -->
+          <div class="card" style="margin-top: 2rem">
+            <h2>Search Transcript</h2>
+
+            <div id="searchMessage"></div>
+
+            <div class="form-group">
+              <label>Find moments in your video</label>
+              <input
+                type="text"
+                id="searchQuery"
+                placeholder="e.g., 'introduction', 'conclusion', 'key insight'..."
+                onkeyup="event.key === 'Enter' && searchClips()"
+              />
+            </div>
+
+            <button class="btn-primary" onclick="searchClips()">Search</button>
+
+            <!-- Search Results -->
+            <div id="searchResults" style="margin-top: 1.5rem; display: none">
+              <h3 style="color: var(--accent); margin-bottom: 1rem">
+                Matching Clips
+              </h3>
+              <div class="clips-container" id="clipsContainer"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Player, Reels, Summary -->
+        <div>
+          <!-- Player Card -->
+          <div class="card">
+            <h2>Video Player</h2>
+            <div class="player-placeholder" id="playerPlaceholder">
+              Click "Process Video" to load
+            </div>
+            <div id="playerInfo" style="display: none">
+              <p style="color: var(--text-muted); margin-bottom: 1rem">
+                Video:
+                <strong id="videoTitle" style="color: var(--accent)"
+                  >Loading...</strong
+                >
+              </p>
+            </div>
+          </div>
+
+          <!-- Reel Card -->
+          <div class="card" style="margin-top: 2rem">
+            <h2>Generate Reel</h2>
+
+            <div id="reelMessage"></div>
+
+            <p
+              style="
+                color: var(--text-muted);
+                margin-bottom: 1.5rem;
+                font-size: 0.9rem;
+              "
+            >
+              Create a shareable highlight reel from your video
+            </p>
+
+            <button class="btn-primary" onclick="generateReel()">
+              Create Reel
+            </button>
+          </div>
+
+          <!-- Summary Card -->
+          <div class="card" style="margin-top: 2rem">
+            <h2>AI Summary</h2>
+
+            <div id="summaryMessage"></div>
+
+            <button class="btn-primary" onclick="generateSummary()">
+              Generate Summary (Gemini AI)
+            </button>
+
+            <div id="summaryResults" style="margin-top: 1.5rem; display: none">
+              <div class="summary-box">
+                <div class="summary-title" id="summaryTitle">
+                  ✨ AI-Powered Summary
+                </div>
+                <ul class="bullet-list" id="summaryBullets"></ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Demo Button -->
+          <div style="margin-top: 2rem; text-align: center">
+            <button
+              class="btn-secondary btn-small"
+              onclick="loadDemo()"
+              style="width: auto"
+            >
+              Load Demo
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer>
+        <p>
+          ClipMind AI — Hackathon Edition | <strong>Never crash</strong>,
+          <strong>Always reliable</strong>
+        </p>
+      </footer>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+      // State
+      let currentMode = "student";
+      let currentVideoId = null;
+
+      // Mode Selection
+      document.querySelectorAll(".mode-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          document
+            .querySelectorAll(".mode-btn")
+            .forEach((b) => b.classList.remove("active"));
+          e.target.classList.add("active");
+          currentMode = e.target.dataset.mode;
+        });
+      });
+
+      // Message Helper
+      function showMessage(elementId, message, type = "info") {
+        const el = document.getElementById(elementId);
+        el.innerHTML = `<div class="message ${type}">${message}</div>`;
+        el.style.display = "block";
+        setTimeout(() => {
+          el.style.display = "none";
+        }, 5000);
+      }
+
+      // Process Video
+      async function processVideo() {
+        const url = document.getElementById("videoUrl").value.trim();
+        if (!url) {
+          showMessage("processMessage", "Please enter a YouTube URL", "error");
+          return;
+        }
+
+        const btn = document.getElementById("processBtn");
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span>Processing...';
+
+        try {
+          const response = await fetch("/process", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url, mode: currentMode }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            currentVideoId = data.video_id;
+            document.getElementById("videoTitle").textContent =
+              data.video_title || "Processed Video";
+            document.getElementById("playerInfo").style.display = "block";
+            document.getElementById("playerPlaceholder").style.display = "none";
+
+            // Show stats
+            document.getElementById("statTranscript").textContent =
+              data.transcript_length || "0";
+            document.getElementById("statClips").textContent =
+              data.clips_count || "0";
+            document.getElementById("stats").style.display = "grid";
+
+            showMessage(
+              "processMessage",
+              "✓ Video processed successfully!",
+              "success",
+            );
+          } else {
+            showMessage(
+              "processMessage",
+              data.message || "Processing failed",
+              "error",
+            );
+          }
+        } catch (err) {
+          showMessage(
+            "processMessage",
+            "Network error: " + err.message,
+            "error",
+          );
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = "Process Video";
+        }
+      }
+
+      // Search Clips
+      async function searchClips() {
+        const query = document.getElementById("searchQuery").value.trim();
+        if (!query) {
+          showMessage("searchMessage", "Enter a search query", "error");
+          return;
+        }
+
+        const btn = event.target;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span>Searching...';
+
+        try {
+          const response = await fetch(
+            `/search?q=${encodeURIComponent(query)}&mode=${currentMode}`,
+          );
+          const data = await response.json();
+
+          if (data.clips && data.clips.length > 0) {
+            displayClips(data.clips);
+            showMessage(
+              "searchMessage",
+              `Found ${data.clips.length} results`,
+              "success",
+            );
+          } else {
+            showMessage(
+              "searchMessage",
+              data.message || "No results found",
+              "info",
+            );
+          }
+        } catch (err) {
+          showMessage("searchMessage", "Search error: " + err.message, "error");
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = "Search";
+        }
+      }
+
+      // Display Clips
+      function displayClips(clips) {
+        const container = document.getElementById("clipsContainer");
+        container.innerHTML = clips
+          .map(
+            (clip, idx) => `
+                <div class="clip-item">
+                    <div class="clip-title">Clip ${idx + 1}</div>
+                    <div style="color: var(--text); margin-bottom: 0.5rem; word-wrap: break-word;">
+                        ${clip.text}
+                    </div>
+                    <div class="clip-meta">
+                        ${clip.start}s - ${clip.end}s
+                    </div>
+                </div>
+            `,
+          )
+          .join("");
+        document.getElementById("searchResults").style.display = "block";
+      }
+
+      // Generate Reel
+      async function generateReel() {
+        const btn = event.target;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span>Creating...';
+
+        try {
+          const response = await fetch(`/reel?mode=${currentMode}`);
+          const data = await response.json();
+
+          if (data.success && data.stream_url) {
+            showMessage(
+              "reelMessage",
+              "✓ Reel created! (Stream URL available)",
+              "success",
+            );
+          } else {
+            showMessage(
+              "reelMessage",
+              data.message || "Reel creation failed",
+              "info",
+            );
+          }
+        } catch (err) {
+          showMessage("reelMessage", "Error: " + err.message, "error");
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = "Create Reel";
+        }
+      }
+
+      // Generate Summary
+      async function generateSummary() {
+        const btn = event.target;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span>Generating...';
+
+        try {
+          const response = await fetch(`/summary?mode=${currentMode}`);
+          const data = await response.json();
+
+          if (data.bullets && data.bullets.length > 0) {
+            const bulletsHtml = data.bullets
+              .map((bullet) => `<li>${bullet}</li>`)
+              .join("");
+            document.getElementById("summaryBullets").innerHTML = bulletsHtml;
+            document.getElementById("summaryTitle").textContent =
+              data.source === "gemini"
+                ? "✨ AI-Powered Summary (Gemini)"
+                : "📝 Summary Template";
+            document.getElementById("summaryResults").style.display = "block";
+            showMessage("summaryMessage", "Summary generated", "success");
+          } else {
+            showMessage("summaryMessage", "No summary available", "info");
+          }
+        } catch (err) {
+          showMessage("summaryMessage", "Error: " + err.message, "error");
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = "Generate Summary (Gemini AI)";
+        }
+      }
+
+      // Load Demo
+      async function loadDemo() {
+        try {
+          const response = await fetch(`/demo?mode=${currentMode}`);
+          const data = await response.json();
+
+          currentVideoId = data.video_id;
+          document.getElementById("videoTitle").textContent = data.video_title;
+          document.getElementById("playerInfo").style.display = "block";
+          document.getElementById("playerPlaceholder").style.display = "none";
+
+          // Show stats
+          document.getElementById("statTranscript").textContent =
+            data.transcript_length || data.transcript.length;
+          document.getElementById("statClips").textContent = data.clips.length;
+          document.getElementById("stats").style.display = "grid";
+
+          // Show clips
+          if (data.clips) {
+            displayClips(data.clips);
+          }
+
+          showMessage("processMessage", "✓ Demo loaded!", "success");
+        } catch (err) {
+          showMessage(
+            "processMessage",
+            "Demo load error: " + err.message,
+            "error",
+          );
+        }
+      }
+
+      // Auto-load demo on start
+      window.addEventListener("load", () => {
+        fetch("/health")
+          .then((r) => r.json())
+          .then((data) => {
+            if (!data.videodb_configured) {
+              showMessage(
+                "processMessage",
+                "⚠️ VideooDB not configured. Using demo mode.",
+                "info",
+              );
+              loadDemo();
+            }
+          });
+      });
+    </script>
+  </body>
+</html>
