@@ -1,0 +1,5 @@
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+python-multipart>=0.0.12
+# PyPI publishes 0.x (e.g. 0.4.x); do not pin a non-existent 1.x minimum
+videodb>=0.4.0
